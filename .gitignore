@@ -1,0 +1,8 @@
+iscaptured
+*.o
+vendor/smcFanControl/smc-command/smc
+build/
+DerivedData/
+xcuserdata/
+.DS_Store
+.architect-callback.md

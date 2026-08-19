@@ -1,0 +1,82 @@
+# FanBoost — XcodeGen project source. Regenerate with: xcodegen generate
+name: FanBoost
+options:
+  bundleIdPrefix: com.kamilkovac
+  deploymentTarget:
+    macOS: "13.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    APP_BUNDLE_ID: com.kamilkovac.FanBoost
+    SWIFT_VERSION: "5.9"
+  configs:
+    # Signing style/identity per configuration; DEVELOPMENT_TEAM also feeds
+    # the helper's XPC client requirement via its embedded Info.plist.
+    # Both identities carry OU=JXGJ4K9KR9 (the parenthesized id in an Apple
+    # Development cert's CN is a personal id, NOT the team).
+    Debug:
+      CODE_SIGN_STYLE: Automatic
+      CODE_SIGN_IDENTITY: Apple Development
+      DEVELOPMENT_TEAM: JXGJ4K9KR9
+    Release:
+      CODE_SIGN_STYLE: Manual
+      CODE_SIGN_IDENTITY: Developer ID Application
+      DEVELOPMENT_TEAM: JXGJ4K9KR9
+targets:
+  FanBoostHelper:
+    type: tool
+    platform: macOS
+    sources:
+      - path: FanBoostHelper
+        excludes:
+          - com.kamilkovac.FanBoostHelper.plist
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kamilkovac.FanBoostHelper
+        SWIFT_OBJC_BRIDGING_HEADER: FanBoostHelper/FanBoostHelper-Bridging-Header.h
+        OTHER_CFLAGS: -DFANBOOST_NO_MAIN -DCMD_TOOL_BUILD
+        SKIP_INSTALL: true
+        # Embed the Info.plist into the tool binary so BuildConfig can read
+        # FBAppBundleID/FBTeamID via Bundle.main — clean-clone-safe, no
+        # generated source files.
+        CREATE_INFOPLIST_SECTION_IN_BINARY: YES
+    info:
+      path: FanBoostHelper/Info.plist
+      properties:
+        FBAppBundleID: $(APP_BUNDLE_ID)
+        FBTeamID: $(DEVELOPMENT_TEAM)
+  FanBoost:
+    type: application
+    platform: macOS
+    sources:
+      - path: FanBoost
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID)
+    info:
+      path: FanBoost/Info.plist
+      properties:
+        LSUIElement: true
+        CFBundleDisplayName: FanBoost
+        NSHumanReadableCopyright: "© Kamil Kovac — GPL-2.0"
+    dependencies:
+      - target: FanBoostHelper
+        embed: false
+    postBuildScripts:
+      # Apple SMAppService bundle layout: helper executable in Contents/MacOS,
+      # daemon plist in Contents/Library/LaunchDaemons (matches BundleProgram).
+      - name: Embed FanBoostHelper
+        script: |
+          APP="$BUILT_PRODUCTS_DIR/$WRAPPER_NAME"
+          mkdir -p "$APP/Contents/Library/LaunchDaemons"
+          cp "$BUILT_PRODUCTS_DIR/FanBoostHelper" "$APP/Contents/MacOS/FanBoostHelper"
+          cp "$SRCROOT/FanBoostHelper/com.kamilkovac.FanBoostHelper.plist" \
+             "$APP/Contents/Library/LaunchDaemons/"
+        inputFiles:
+          - $(BUILT_PRODUCTS_DIR)/FanBoostHelper
+          - $(SRCROOT)/FanBoostHelper/com.kamilkovac.FanBoostHelper.plist
+        outputFiles:
+          - $(BUILT_PRODUCTS_DIR)/$(WRAPPER_NAME)/Contents/MacOS/FanBoostHelper
+          - $(BUILT_PRODUCTS_DIR)/$(WRAPPER_NAME)/Contents/Library/LaunchDaemons/com.kamilkovac.FanBoostHelper.plist

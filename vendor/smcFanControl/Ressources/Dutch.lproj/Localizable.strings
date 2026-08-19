@@ -1,0 +1,42 @@
+"Do you really want to delete the favorite %@?" = "Weet je zeker dat je de favoriet %@ wilt wissen?";
+
+"Yes" = "Ja";
+
+"No" = "Nee";
+
+"Delete favorite" = "Verwijder Favoriet";
+
+"MainFan" = "Hoofd Fan";
+
+"Left Fan" = "Linker Fan";
+
+"Right Fan" = "Rechter Fan";
+
+"smcFanControl has not been tested on this machine yet, but it should run if you follow the instructions. \n\nIf you choose to continue, please make sure you have no other FanControl-software running. Otherwise please quit, deinstall the other software, restart your machine and rerun smcFanControl!" = "smcFanControl is nog niet getest op deze machine, maar het zou moeten werken als je de instructies volgt. \n\nAls je doorgaat, zorg dan dat er geen andere FanControl-software draait. Als dat wel zo is, de-installeer deze software dan, stop smcFanControl en restart je computer voor je smcFanControl installeert!";
+
+"Continue" = "Doorgaan";
+
+"Quit" = "Stop";
+
+"Alert!" = "Let op!";
+
+"Active Setting" = "Actieve Instelling";
+
+
+"Remind me later" = "Remind me later";
+
+"Consider a donation" = "Consider a donation";
+
+"Never ask me again" = "Never ask me again";
+
+"Donate over Paypal" = "Donate over Paypal";
+
+"smcFanControl keeps your Mac cool since 2006.\n\nIf smcFanControl is helfpul for you and you want to support further development, a small donation over Paypal is much appreciated." = "smcFanControl keeps your Mac cool since 2006.\n\nIf smcFanControl is helfpul for you and you want to support further development, a small donation over Paypal is much appreciated.";
+
+"Do you want to reset smcFanControl to default settings? Favorites will be deleted and fans will return to default speed." = "Do you want to reset smcFanControl to default settings?\nFavorites will be deleted and fans will return to default speed.";
+
+"Please shutdown your computer now to return to default fan settings." = "Please shutdown your computer now to return to default fan settings.";
+
+"Reset Settings" = "Reset Settings";
+
+"Shutdown required" = "Shutdown required";

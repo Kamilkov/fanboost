@@ -9,19 +9,26 @@ settings:
   base:
     APP_BUNDLE_ID: com.kamilkovac.FanBoost
     SWIFT_VERSION: "5.9"
+    # Hardened Runtime with library validation on both targets and NO
+    # DYLD/library-validation exception entitlements — this is what stops a
+    # local process injecting into the pinned app identity.
+    ENABLE_HARDENED_RUNTIME: YES
   configs:
-    # Signing style/identity per configuration; DEVELOPMENT_TEAM also feeds
-    # the helper's XPC client requirement via its embedded Info.plist.
-    # Both identities carry OU=JXGJ4K9KR9 (the parenthesized id in an Apple
-    # Development cert's CN is a personal id, NOT the team).
+    # Signing style/identity per configuration; DEVELOPMENT_TEAM and
+    # FB_IDENTITY_CLASS feed each binary's embedded XPC requirement, making
+    # Debug and Release non-interchangeable. Both identities carry
+    # OU=JXGJ4K9KR9 (the parenthesized id in an Apple Development cert's CN is
+    # a personal id, NOT the team).
     Debug:
       CODE_SIGN_STYLE: Automatic
       CODE_SIGN_IDENTITY: Apple Development
       DEVELOPMENT_TEAM: JXGJ4K9KR9
+      FB_IDENTITY_CLASS: apple-development
     Release:
       CODE_SIGN_STYLE: Manual
       CODE_SIGN_IDENTITY: Developer ID Application
       DEVELOPMENT_TEAM: JXGJ4K9KR9
+      FB_IDENTITY_CLASS: developer-id
 targets:
   FanBoostHelper:
     type: tool
@@ -46,6 +53,7 @@ targets:
       properties:
         FBAppBundleID: $(APP_BUNDLE_ID)
         FBTeamID: $(DEVELOPMENT_TEAM)
+        FBIdentityClass: $(FB_IDENTITY_CLASS)
   FanBoost:
     type: application
     platform: macOS
@@ -61,6 +69,10 @@ targets:
         LSUIElement: true
         CFBundleDisplayName: FanBoost
         NSHumanReadableCopyright: "© Kamil Kovac — GPL-2.0"
+        # Same per-config keys as the helper, so the app builds the symmetric
+        # requirement that pins the helper (defense in depth, both directions).
+        FBTeamID: $(DEVELOPMENT_TEAM)
+        FBIdentityClass: $(FB_IDENTITY_CLASS)
     dependencies:
       - target: FanBoostHelper
         embed: false

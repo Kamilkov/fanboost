@@ -9,9 +9,18 @@
 
 extern io_connect_t g_conn;
 
-static void copy_key(UInt32Char_t dst, const char *key) {
-    strncpy(dst, key, 4);
+int fb_key_is_valid(const char *key) {
+    return (key != NULL && strlen(key) == 4) ? 1 : 0;
+}
+
+/* SMC keys are exactly 4 bytes. Reject any other length instead of silently
+ * truncating (e.g. a hypothetical "F10Md" must NOT become "F10M"). Returns 0
+ * on success, -1 if the key is not exactly 4 characters. */
+static int copy_key(UInt32Char_t dst, const char *key) {
+    if (!fb_key_is_valid(key)) return -1;
+    memcpy(dst, key, 4);
     dst[4] = 0;
+    return 0;
 }
 
 int fb_smc_open(void) {
@@ -21,10 +30,17 @@ int fb_smc_open(void) {
 
 void fb_smc_close(void) { smc_close(); }
 
+void fb_smc_reset(void) {
+    if (g_conn) {
+        SMCClose(g_conn);
+        g_conn = 0;
+    }
+}
+
 int fb_read_u8(const char *key, unsigned char *out) {
     SMCVal_t val;
     UInt32Char_t k;
-    copy_key(k, key);
+    if (copy_key(k, key) != 0) return -1;
     memset(&val, 0, sizeof(val));
     if (SMCReadKey(k, &val) != kIOReturnSuccess || val.dataSize < 1) return -1;
     *out = val.bytes[0];
@@ -34,7 +50,7 @@ int fb_read_u8(const char *key, unsigned char *out) {
 int fb_read_flt(const char *key, float *out) {
     SMCVal_t val;
     UInt32Char_t k;
-    copy_key(k, key);
+    if (copy_key(k, key) != 0) return -1;
     memset(&val, 0, sizeof(val));
     if (SMCReadKey(k, &val) != kIOReturnSuccess || val.dataSize != 4) return -1;
     memcpy(out, val.bytes, 4); /* flt keys are IEEE-754 little-endian */
@@ -53,7 +69,7 @@ int fb_write_hex(const char *key, const char *hex) {
     UInt32Char_t k;
     size_t i, len;
 
-    copy_key(k, key);
+    if (copy_key(k, key) != 0) return -1;
     len = strlen(hex);
     if (len == 0 || len % 2 != 0 || len / 2 > sizeof(inputStructure.bytes)) return -1;
 

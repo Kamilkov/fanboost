@@ -21,17 +21,27 @@ notices preserved in `FanBoostHelper/SMC/`).
   the boost speed is a percent of each fan's own min–max range, clamped
   per fan, so it is portable across models. Fanless Macs are detected and
   the app disables itself.
-- **XPC security:** the helper only accepts connections from the FanBoost
-  app, enforced with `NSXPCConnection.setCodeSigningRequirement` pinning
-  the app's bundle ID and signing Team ID. No debug bypass exists.
+- **XPC security:** app and helper pin **each other** with
+  `NSXPCConnection.setCodeSigningRequirement`. The requirement is
+  per-configuration — bundle ID + Team OU + the signing **identity class**
+  (Apple Development for Debug, Developer ID for Release) — so builds from
+  different configs are not interchangeable. No debug bypass exists; if the
+  embedded Team/identity values are missing the helper refuses to serve and
+  the app refuses to connect (fail closed). Both targets build with
+  **Hardened Runtime** (library validation, no DYLD exceptions), so a local
+  process cannot inject into the pinned app identity.
+- **Single active client:** the helper grants boost to one owning connection
+  at a time; other clients cannot feed its dead-man or cancel its boost.
 
 ## Safety behavior
 
 Manual fan state must never outlive its reason. The helper restores
-automatic control on: capture end, app disable/quit, XPC connection loss,
-a 60 s dead-man timeout if the app stops pinging, graceful termination
-(SIGTERM via dispatch source), and **its own startup** — combined with
-launchd `KeepAlive`, even a helper crash leads to restart → restore.
+automatic control on: capture end, app disable/quit, XPC connection loss (of
+the owner), a 60 s dead-man timeout if the owner stops pinging, graceful
+termination (SIGTERM via dispatch source), and **its own startup** — combined
+with launchd `KeepAlive`, even a helper crash leads to restart → restore. If
+the SMC is momentarily unavailable at startup, the helper reports "fan state
+unknown" (never a false "fanless"), keeps retrying, and restores on recovery.
 
 ## Build & run
 
@@ -44,16 +54,19 @@ xcodebuild -project FanBoost.xcodeproj -scheme FanBoost -configuration Release b
 ```
 
 Signing: Debug uses your Apple Development identity, Release the Developer
-ID Application identity — both under Team `JXGJ4K9KR9`, set in
-`project.yml`, which also feeds the helper's XPC client requirement via its
-embedded Info.plist. To run: copy `FanBoost.app` to `/Applications`, launch,
-click "Install Fan Helper…", approve in System Settings → Login Items.
+ID Application identity — both under Team `JXGJ4K9KR9`, set in `project.yml`,
+which also feeds each binary's XPC requirement via its embedded Info.plist.
+To run: copy `FanBoost.app` to `/Applications`, launch, click "Install Fan
+Helper…", approve in System Settings → Login Items. To remove it, use
+"Uninstall Fan Helper" (restores auto, then unregisters the daemon).
 
-Self-checks (no root, no hardware writes):
+Checks (no root, no hardware writes):
 
 ```sh
 swiftc Shared/FanMath.swift checks/main.swift -o build/selfcheck && ./build/selfcheck
 FANBOOST_DRY_RUN=1 <built FanBoostHelper> --dryrun-check
+checks/verify-hardened.sh <FanBoost.app>              # runtime flags, no exception entitlements
+checks/verify-requirements.sh <debug.app> <release.app>  # config separation (codesign -R)
 ```
 
 ## Supported / unverified hardware
@@ -68,7 +81,14 @@ FANBOOST_DRY_RUN=1 <built FanBoostHelper> --dryrun-check
 
 ## Repo history
 
-The original single-machine shell prototype (`watcher.sh`, `iscaptured.c`,
-`install.sh`, sudoers approach) is kept at the repo root until the app
-fully replaces it; `docs/implementation-plan.md` records the v1 plan.
-Release signing (Developer ID) + notarization are a separate closeout step.
+FanBoost grew from a single-machine shell prototype (`watcher.sh` +
+`install.sh` + a sudoers rule). That prototype has been **removed** from the
+current tree in favor of the app; it remains in earlier git history. If you
+ever ran the old `install.sh`, use **"Remove old capture-fan"** in the menu:
+the app unlinks its user LaunchAgent, and the root helper removes the two root
+files (`/private/etc/sudoers.d/capture-fan` and
+`/usr/local/libexec/capture-fan/smc`) with a fail-closed, descriptor-relative
+walk that follows no symlink and refuses any non-root or writable directory
+component. The (possibly empty) `capture-fan` directory is left in place. Plans:
+`docs/implementation-plan.md`, `docs/red-team-remediation-plan.md`. Release
+signing (Developer ID) + notarization are a separate closeout step.

@@ -1,4 +1,3 @@
-iscaptured
 *.o
 vendor/smcFanControl/smc-command/smc
 build/

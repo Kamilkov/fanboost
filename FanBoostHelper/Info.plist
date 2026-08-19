@@ -18,6 +18,8 @@
 	<string>1</string>
 	<key>FBAppBundleID</key>
 	<string>$(APP_BUNDLE_ID)</string>
+	<key>FBIdentityClass</key>
+	<string>$(FB_IDENTITY_CLASS)</string>
 	<key>FBTeamID</key>
 	<string>$(DEVELOPMENT_TEAM)</string>
 </dict>

@@ -14,4 +14,7 @@ public let kHelperPlistName = "com.kamilkovac.FanBoostHelper.plist"
     func restoreAuto(reply: @escaping (String?) -> Void)
     /// Dead-man keep-alive; the app calls this every ≤15 s while boosted.
     func ping()
+    /// Remove the obsolete capture-fan prototype's root-owned artifacts
+    /// (fixed paths, no parameters). Idempotent. reply(summary).
+    func cleanupLegacy(reply: @escaping (String) -> Void)
 }

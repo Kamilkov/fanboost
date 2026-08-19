@@ -7,18 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0E538381DFD8434374C0CC1C /* BuildConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98CB47AAD68ABE37B2C6A6F0 /* BuildConfig.swift */; };
 		0F25755D4F8D5832170A518C /* FanMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0120326251EA955D954008DF /* FanMath.swift */; };
 		132F4F08E3B938D4E3EA102C /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80B68F59C2F7F4E69F7216BF /* main.swift */; };
+		16A002574BBBEF4EEE205180 /* PeerRequirement.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F77636D1668F01A06878D4 /* PeerRequirement.swift */; };
+		16A1671B3209B1A75A86C62B /* LegacyCleanup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AA8EE94F4A8A36D36FE6FBD /* LegacyCleanup.swift */; };
 		175CD9C4CA14E10B397C701A /* HelperClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EDA3BA638F7D8F8DF2A1687 /* HelperClient.swift */; };
 		175E6F95853C38F6EF06FE49 /* smc_bridge.c in Sources */ = {isa = PBXBuildFile; fileRef = D32DF439FB4A5165BEC335B4 /* smc_bridge.c */; };
 		2E80969857F4447F8E324E37 /* FanMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0120326251EA955D954008DF /* FanMath.swift */; };
+		3727DF13FA0681463EFDB940 /* LegacyPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532D22D05212DB47E282423 /* LegacyPaths.swift */; };
 		3A86163F55849A5C4372022C /* FanController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D294B3CB01012D9DB61F9EA4 /* FanController.swift */; };
+		63562F46E44634618A1BBF8F /* SecureUnlink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E4F9E946616349EEC0A7490 /* SecureUnlink.swift */; };
+		7A98D48CE03707056320692F /* PeerRequirement.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F77636D1668F01A06878D4 /* PeerRequirement.swift */; };
 		8B673D561FAC2EF31D36E9A6 /* CaptureProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC24DF2D32C35BF81A7B18EF /* CaptureProbe.swift */; };
 		90B4FF0468466F556B3A4FBD /* FanBoostXPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BB11452B9B37ECD13610E /* FanBoostXPC.swift */; };
 		9B98990C73624EB6657D7AD7 /* smc.c in Sources */ = {isa = PBXBuildFile; fileRef = A695A482CFA280C8653741A7 /* smc.c */; };
 		A40B8680E35AF5540DFB7692 /* FanBoostApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D8CA654358FCA1263785B6C /* FanBoostApp.swift */; };
 		B12D736095F27DB08CD2253C /* FanBoostXPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BB11452B9B37ECD13610E /* FanBoostXPC.swift */; };
+		DC90B839FDBC3B072E9BF44F /* OwnerGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F542D04761E506304B4E8F /* OwnerGate.swift */; };
+		DDF92EF5051A69F6ABB3DF19 /* LegacyPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532D22D05212DB47E282423 /* LegacyPaths.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +39,7 @@
 
 /* Begin PBXFileReference section */
 		0120326251EA955D954008DF /* FanMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanMath.swift; sourceTree = "<group>"; };
+		0532D22D05212DB47E282423 /* LegacyPaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyPaths.swift; sourceTree = "<group>"; };
 		0876C3C05D55EC4023C5C3E8 /* FanBoost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FanBoost.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0D8CA654358FCA1263785B6C /* FanBoostApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanBoostApp.swift; sourceTree = "<group>"; };
 		0EBD00DD3D59508291D33A19 /* smc_bridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = smc_bridge.h; sourceTree = "<group>"; };
@@ -40,11 +47,14 @@
 		25CF13FD80196A715B881209 /* smc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = smc.h; sourceTree = "<group>"; };
 		3F95D4D0C9A6C715FBE130A0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5379637D70E2A6DCFDC7D8C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		7AA8EE94F4A8A36D36FE6FBD /* LegacyCleanup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyCleanup.swift; sourceTree = "<group>"; };
+		7E4F9E946616349EEC0A7490 /* SecureUnlink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureUnlink.swift; sourceTree = "<group>"; };
 		80B68F59C2F7F4E69F7216BF /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		914DD63D77EF33D5480DCADF /* FanBoostHelper-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FanBoostHelper-Bridging-Header.h"; sourceTree = "<group>"; };
-		98CB47AAD68ABE37B2C6A6F0 /* BuildConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildConfig.swift; sourceTree = "<group>"; };
 		A695A482CFA280C8653741A7 /* smc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = smc.c; sourceTree = "<group>"; };
 		AA1BB11452B9B37ECD13610E /* FanBoostXPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanBoostXPC.swift; sourceTree = "<group>"; };
+		B9F542D04761E506304B4E8F /* OwnerGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OwnerGate.swift; sourceTree = "<group>"; };
+		B9F77636D1668F01A06878D4 /* PeerRequirement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeerRequirement.swift; sourceTree = "<group>"; };
 		D294B3CB01012D9DB61F9EA4 /* FanController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanController.swift; sourceTree = "<group>"; };
 		D32DF439FB4A5165BEC335B4 /* smc_bridge.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = smc_bridge.c; sourceTree = "<group>"; };
 		FC24DF2D32C35BF81A7B18EF /* CaptureProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureProbe.swift; sourceTree = "<group>"; };
@@ -96,11 +106,13 @@
 		BF431A124158375A9C262D83 /* FanBoostHelper */ = {
 			isa = PBXGroup;
 			children = (
-				98CB47AAD68ABE37B2C6A6F0 /* BuildConfig.swift */,
 				914DD63D77EF33D5480DCADF /* FanBoostHelper-Bridging-Header.h */,
 				D294B3CB01012D9DB61F9EA4 /* FanController.swift */,
 				5379637D70E2A6DCFDC7D8C1 /* Info.plist */,
+				7AA8EE94F4A8A36D36FE6FBD /* LegacyCleanup.swift */,
 				80B68F59C2F7F4E69F7216BF /* main.swift */,
+				B9F542D04761E506304B4E8F /* OwnerGate.swift */,
+				7E4F9E946616349EEC0A7490 /* SecureUnlink.swift */,
 				0D21625A0141B3B7EED1796C /* SMC */,
 			);
 			path = FanBoostHelper;
@@ -111,6 +123,8 @@
 			children = (
 				AA1BB11452B9B37ECD13610E /* FanBoostXPC.swift */,
 				0120326251EA955D954008DF /* FanMath.swift */,
+				0532D22D05212DB47E282423 /* LegacyPaths.swift */,
+				B9F77636D1668F01A06878D4 /* PeerRequirement.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -226,6 +240,8 @@
 				90B4FF0468466F556B3A4FBD /* FanBoostXPC.swift in Sources */,
 				0F25755D4F8D5832170A518C /* FanMath.swift in Sources */,
 				175CD9C4CA14E10B397C701A /* HelperClient.swift in Sources */,
+				DDF92EF5051A69F6ABB3DF19 /* LegacyPaths.swift in Sources */,
+				7A98D48CE03707056320692F /* PeerRequirement.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -233,10 +249,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0E538381DFD8434374C0CC1C /* BuildConfig.swift in Sources */,
 				B12D736095F27DB08CD2253C /* FanBoostXPC.swift in Sources */,
 				3A86163F55849A5C4372022C /* FanController.swift in Sources */,
 				2E80969857F4447F8E324E37 /* FanMath.swift in Sources */,
+				16A1671B3209B1A75A86C62B /* LegacyCleanup.swift in Sources */,
+				3727DF13FA0681463EFDB940 /* LegacyPaths.swift in Sources */,
+				DC90B839FDBC3B072E9BF44F /* OwnerGate.swift in Sources */,
+				16A002574BBBEF4EEE205180 /* PeerRequirement.swift in Sources */,
+				63562F46E44634618A1BBF8F /* SecureUnlink.swift in Sources */,
 				132F4F08E3B938D4E3EA102C /* main.swift in Sources */,
 				9B98990C73624EB6657D7AD7 /* smc.c in Sources */,
 				175E6F95853C38F6EF06FE49 /* smc_bridge.c in Sources */,
@@ -311,8 +331,10 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = JXGJ4K9KR9;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FB_IDENTITY_CLASS = "developer-id";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -401,8 +423,10 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = JXGJ4K9KR9;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				FB_IDENTITY_CLASS = "apple-development";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;

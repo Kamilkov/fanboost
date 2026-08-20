@@ -34,7 +34,7 @@ Apple SMAppService docs. The vendored `vendor/smcFanControl/Sparkle.framework`
 ## 3. Hosting (HTTPS, this GitHub repo)
 
 - Archives: GitHub Releases assets —
-  `https://github.com/Kamilkov/fanboost/releases/download/vX.Y.Z/FanBoost-X.Y.Z.zip`.
+  `https://github.com/Kamilkov/fanboost/releases/download/vX.Y.Z/FanBoost-X.Y.Z.dmg`.
 - Appcast: `appcast.xml` committed on `main`, served at
   `https://raw.githubusercontent.com/Kamilkov/fanboost/main/appcast.xml`
   (HTTPS, ATS-clean; Sparkle parses regardless of text/plain content type).
@@ -56,14 +56,15 @@ Apple SMAppService docs. The vendored `vendor/smcFanControl/Sparkle.framework`
 ## 4. Signing chain & key handling
 
 Order per release: Developer ID build → notarize (`fanboost-notary`
-profile) → staple → `ditto -c -k --sequesterRsrc --keepParent` zip →
-EdDSA-sign the zip. Both signatures verified in acceptance (§7).
+profile) and staple the app → build and Developer ID-sign the DMG → notarize
+and staple the DMG → EdDSA-sign the DMG. Both signatures are verified in
+acceptance (§7).
 
 - One-time: `generate_keys` on the release Mac; private key lives ONLY in
   that Mac's login Keychain (never in repo, env, or CI); public key into
   `SUPublicEDKey`. Backup once via `generate_keys -x <file>` stored
   encrypted offline; `-f` re-imports. Key rotation is out of scope.
-- Per release: `sign_update FanBoost-X.Y.Z.zip` (or `generate_appcast` over
+- Per release: `sign_update FanBoost-X.Y.Z.dmg` (or `generate_appcast` over
   the archives folder) produces `sparkle:edSignature`/`length`.
 
 ## 5. Fail-safe update lifecycle for the SMAppService helper
@@ -176,14 +177,15 @@ before the appcast that points at it.
 2. **Local**: clean Release build → selfcheck, helper `--dryrun-check`,
    `checks/verify-hardened.sh` (incl. nested code, §7), deep/strict,
    `verify-requirements.sh`.
-3. **Local**: notarize + staple + spctl/stapler verification (existing
-   gate flow).
-4. **Local**: `ditto` zip → `sign_update` → verify the archive: EdDSA
-   signature verifies against `SUPublicEDKey`, byte `length` recorded,
-   unzipped copy still passes stapler/spctl/deep-strict.
+3. **Local**: notarize + staple the app, then run spctl/stapler verification
+   (existing gate flow).
+4. **Local**: build and Developer ID-sign the DMG, notarize + staple it,
+   then run `sign_update`. Verify the archive: EdDSA signature verifies
+   against `SUPublicEDKey`, byte `length` is recorded, the DMG passes
+   stapler/spctl, and its mounted app passes stapler/spctl/deep-strict.
 5. **Publish asset**: tag `vX.Y.Z`, push commit + tag, create GitHub
-   Release `vX.Y.Z`, upload the zip, verify the download URL serves the
-   exact byte length/hash of the local archive.
+   Release `vX.Y.Z`, upload the DMG, verify the download URL serves the
+   exact byte length/hash of the local DMG.
 6. **Publish appcast last**: append the `<item>` pointing at the verified
    asset URL, commit + push appcast.xml, fetch it from `SUFeedURL` and
    confirm it parses and matches signature/length.
@@ -201,7 +203,7 @@ before the appcast that points at it.
   acceptable only if explicitly listed with its signer — no silent
   exceptions;
   `sign_update --verify` (or a fresh `sign_update` equality check) accepts
-  the published zip + appcast signature; appcast URL fetches over HTTPS.
+  the published DMG + appcast signature; appcast URL fetches over HTTPS.
 - **Two-phase local drill** (before first real publish; today's installed
   1.0 has no Sparkle and cannot update itself):
   - Phase A — manual baseline migration: with 1.0 + its registered helper

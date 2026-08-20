@@ -60,6 +60,10 @@ To run: copy `FanBoost.app` to `/Applications`, launch, click "Install Fan
 Helper…", approve in System Settings → Login Items. To remove it, use
 "Uninstall Fan Helper" (restores auto, then unregisters the daemon).
 
+To package a drag-to-Applications disk image from a built app:
+`scripts/make-dmg.sh [FanBoost.app] [output.dmg]` (defaults: the DerivedData
+Release app → `build/FanBoost-<version>.dmg`; refuses to overwrite).
+
 Checks (no root, no hardware writes):
 
 ```sh

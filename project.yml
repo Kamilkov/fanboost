@@ -5,10 +5,18 @@ options:
   deploymentTarget:
     macOS: "13.0"
   createIntermediateGroups: true
+packages:
+  # Sparkle 2 (current stable pinned by Package.resolved). NEVER link the
+  # vendored Sparkle 1 copy under vendor/smcFanControl.
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: "2.9.6"
 settings:
   base:
     APP_BUNDLE_ID: com.kamilkovac.FanBoost
     SWIFT_VERSION: "5.9"
+    MARKETING_VERSION: 1.1.0
+    CURRENT_PROJECT_VERSION: 2
     # Hardened Runtime with library validation on both targets and NO
     # DYLD/library-validation exception entitlements — this is what stops a
     # local process injecting into the pinned app identity.
@@ -59,6 +67,8 @@ targets:
         FBAppBundleID: $(APP_BUNDLE_ID)
         FBTeamID: $(DEVELOPMENT_TEAM)
         FBIdentityClass: $(FB_IDENTITY_CLASS)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
   FanBoost:
     type: application
     platform: macOS
@@ -78,9 +88,16 @@ targets:
         # requirement that pins the helper (defense in depth, both directions).
         FBTeamID: $(DEVELOPMENT_TEAM)
         FBIdentityClass: $(FB_IDENTITY_CLASS)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        SUFeedURL: https://raw.githubusercontent.com/Kamilkov/fanboost/main/appcast.xml
+        # Public half only; the EdDSA private key lives solely in the login
+        # Keychain of the release Mac (Sparkle generate_keys).
+        SUPublicEDKey: antWOJdJaI860Q4DofY+u+mp9bOMSrqeStfx2jROeaA=
     dependencies:
       - target: FanBoostHelper
         embed: false
+      - package: Sparkle
     postBuildScripts:
       # Apple SMAppService bundle layout: helper executable in Contents/MacOS,
       # daemon plist in Contents/Library/LaunchDaemons (matches BundleProgram).
@@ -97,3 +114,21 @@ targets:
         outputFiles:
           - $(BUILT_PRODUCTS_DIR)/$(WRAPPER_NAME)/Contents/MacOS/FanBoostHelper
           - $(BUILT_PRODUCTS_DIR)/$(WRAPPER_NAME)/Contents/Library/LaunchDaemons/com.kamilkovac.FanBoostHelper.plist
+      # Xcode's Embed & Sign re-signs Sparkle.framework itself but leaves its
+      # nested executables ad-hoc, which notarization rejects. Re-sign them
+      # per Sparkle's official manual-signing guidance, innermost first, with
+      # the Release Developer ID + hardened runtime + timestamp; Downloader.xpc
+      # keeps its entitlements (--preserve-metadata=entitlements). The listed
+      # paths are intentionally coupled to Sparkle 2.9.6's official layout —
+      # revisit them together with any Sparkle version bump. The product
+      # CodeSign phase then re-seals the app.
+      - name: Re-sign Sparkle nested code (Release)
+        script: |
+          if [ "$CONFIGURATION" = "Release" ]; then
+            FW="$BUILT_PRODUCTS_DIR/$WRAPPER_NAME/Contents/Frameworks/Sparkle.framework"
+            codesign -f -o runtime --timestamp -s "$EXPANDED_CODE_SIGN_IDENTITY" --preserve-metadata=entitlements "$FW/Versions/B/XPCServices/Downloader.xpc"
+            codesign -f -o runtime --timestamp -s "$EXPANDED_CODE_SIGN_IDENTITY" "$FW/Versions/B/XPCServices/Installer.xpc"
+            codesign -f -o runtime --timestamp -s "$EXPANDED_CODE_SIGN_IDENTITY" "$FW/Versions/B/Autoupdate"
+            codesign -f -o runtime --timestamp -s "$EXPANDED_CODE_SIGN_IDENTITY" "$FW/Versions/B/Updater.app"
+            codesign -f -o runtime --timestamp -s "$EXPANDED_CODE_SIGN_IDENTITY" "$FW"
+          fi

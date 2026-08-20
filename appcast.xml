@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FanBoost update feed. Bootstrap state: valid empty channel; items are
+     appended only at the release gate, after a signed asset exists. -->
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>FanBoost</title>
+    <link>https://github.com/Kamilkov/fanboost</link>
+    <description>FanBoost release updates</description>
+    <language>en</language>
+  </channel>
+</rss>

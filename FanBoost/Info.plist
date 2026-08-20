@@ -17,9 +17,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>FBIdentityClass</key>
 	<string>$(FB_IDENTITY_CLASS)</string>
 	<key>FBTeamID</key>
@@ -28,5 +28,9 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>© Kamil Kovac — GPL-2.0</string>
+	<key>SUFeedURL</key>
+	<string>https://raw.githubusercontent.com/Kamilkov/fanboost/main/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>antWOJdJaI860Q4DofY+u+mp9bOMSrqeStfx2jROeaA=</string>
 </dict>
 </plist>

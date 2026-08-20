@@ -1,6 +1,7 @@
 // FanBoost — menu-bar app: capture watcher + controls. GPL-2.0.
 import SwiftUI
 import ServiceManagement
+import Sparkle
 
 enum Phase: Equatable {
     case idle
@@ -11,6 +12,11 @@ enum Phase: Equatable {
 
 @MainActor
 final class AppState: ObservableObject {
+    // Single instance shared with TerminationGate: an
+    // @NSApplicationDelegateAdaptor delegate is created before the App's
+    // @StateObject is readable, so both reach the same state through here.
+    static let shared = AppState()
+
     @AppStorage("enabled") var enabled = true
     @AppStorage("boostPercent") var boostPercent = 65.0
 
@@ -18,27 +24,178 @@ final class AppState: ObservableObject {
     @Published var fanInfo = "querying helper…"
     @Published var helperStatus: SMAppService.Status = .notRegistered
     @Published var lastError: String?
+    /// Bundle-version reconciliation done — polling/boosting stays gated
+    /// off until true so a new app never drives an old helper.
+    @Published var reconciled = false
 
     private let probe = CaptureProbe()
     private let helper = HelperClient()
     private let daemon = SMAppService.daemon(plistName: kHelperPlistName)
     private var pollTimer: Timer?
     private var pingTimer: Timer?
+    private var reconciling = false
+    private static let markerKey = "lastRunBundleVersion"
+    private var bundleVersion: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "0"
+    }
 
-    init() {
+    private init() {
         refreshHelperStatus()
         pollTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.tick() }
         }
+        if reconcileNeeded(lastRun: UserDefaults.standard.string(forKey: Self.markerKey),
+                           current: bundleVersion) {
+            reconcile()
+        } else {
+            reconciled = true
+            refreshStatusFromHelper()
+        }
+    }
+
+    // MARK: bundle-version reconciliation (spec §5.2, consent-preserving)
+
+    private static let pendingKey = "helperReplacementPending"
+    private var pendingReplacement: Bool {
+        get { UserDefaults.standard.bool(forKey: Self.pendingKey) }
+        set { UserDefaults.standard.set(newValue, forKey: Self.pendingKey) }
+    }
+    private var helperState: HelperState {
+        switch helperStatus {
+        case .enabled: return .enabled
+        case .requiresApproval: return .requiresApproval
+        default: return .unregistered
+        }
+    }
+
+    /// Idempotent; re-run each tick until it resolves. Never auto-registers
+    /// a helper the user hasn't installed. `pendingReplacement` is persisted
+    /// BEFORE unregister so a transient notRegistered mid-replacement (or a
+    /// crash/relaunch inside the window) can never be misread as first-run
+    /// consent and write the marker without a fresh helper round-trip.
+    private func reconcile() {
+        guard !reconciled, !reconciling else { return }
+        switch reconcileAction(pendingReplacement: pendingReplacement, helper: helperState) {
+        case .finish: // genuine first run: no helper installed, none pending
+            finishReconciliation() // registration stays with the Install button
+        case .wait:
+            break // approval UI, or mid-replacement transient — next tick retries;
+                  // the user-driven Install button also recovers a failed register
+        case .confirmOnly:
+            // Replacement already ran (this launch or a previous one) and the
+            // service is enabled: ONLY confirm with a fresh round-trip — never
+            // restore/unregister again.
+            reconciling = true
+            helper.invalidate() // fresh connection, never a stale cached peer
+            guard let proxy = helperProxy() else { reconciling = false; return }
+            proxy.status { [weak self] _, _, _ in
+                Task { @MainActor in
+                    guard let self else { return }
+                    self.reconciling = false
+                    self.finishReconciliation()
+                }
+            }
+        case .beginReplacement:
+            reconciling = true
+            guard let proxy = helperProxy() else {
+                reconciling = false
+                lastError = "Update reconciliation: helper unreachable — will retry."
+                return
+            }
+            proxy.restoreAuto { [weak self] err in
+                Task { @MainActor in
+                    guard let self else { return }
+                    if let err {
+                        self.reconciling = false
+                        self.lastError = "Update reconciliation: restore failed (\(err)) — will retry."
+                        return
+                    }
+                    // Mark the replacement in flight BEFORE unregister, then
+                    // drop the cached connection to the OLD helper.
+                    self.pendingReplacement = true
+                    self.helper.invalidate()
+                    // SMAppService.h: only after the unregister completion
+                    // handler has been invoked is it safe to re-register.
+                    // The synchronous back-to-back call raced launchd's
+                    // removal (runtime-proven) — never register before this
+                    // completion fires.
+                    self.daemon.unregister { unregErr in
+                        Task { @MainActor in
+                            if let unregErr {
+                                self.reconciling = false
+                                self.refreshHelperStatus()
+                                self.lastError = "Update reconciliation: unregister failed: \(unregErr.localizedDescription)"
+                                return
+                            }
+                            do {
+                                try self.daemon.register()
+                            } catch {
+                                self.reconciling = false
+                                self.refreshHelperStatus()
+                                self.lastError = "Update reconciliation: re-register failed: \(error.localizedDescription)"
+                                return // pending stays set; Install button / next tick recover
+                            }
+                            self.refreshHelperStatus()
+                            self.reconciling = false
+                            guard self.helperStatus == .enabled else { return } // approval UI; pending stays
+                            self.reconcile() // falls into .confirmOnly for the fresh round-trip
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func finishReconciliation() {
+        pendingReplacement = false
+        UserDefaults.standard.set(bundleVersion, forKey: Self.markerKey)
+        reconciled = true
         refreshStatusFromHelper()
+    }
+
+    // MARK: termination gate (spec §5.1) — called by TerminationGate
+
+    /// One unconditional restoreAuto with a bounded timeout; the reply and
+    /// the timeout funnel through one OneShot so AppKit gets exactly one
+    /// reply. Fails closed whenever boosting/restoration is unconfirmed.
+    func confirmRestoreForTermination(_ completion: @escaping (Bool) -> Void) {
+        refreshHelperStatus()
+        let enabledNow = helperStatus == .enabled
+        let boosting = phase == .boosting
+        if mayTerminate(helperEnabled: enabledNow, boosting: boosting, restore: .notAttempted) {
+            completion(true) // no app-owned manual state possible
+            return
+        }
+        guard let proxy = helperProxy() else {
+            lastError = "Quit/update cancelled: fan restore not confirmed (helper unreachable)."
+            completion(false)
+            return
+        }
+        let shot = OneShot()
+        let decide: (RestoreOutcome) -> Void = { [weak self] outcome in
+            let ok = mayTerminate(helperEnabled: enabledNow, boosting: boosting, restore: outcome)
+            if !ok { self?.lastError = "Quit/update cancelled: fan restore not confirmed." }
+            completion(ok)
+        }
+        let timeout = DispatchWorkItem { shot.fire { decide(.timedOut) } }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10, execute: timeout)
+        proxy.restoreAuto { err in
+            Task { @MainActor in
+                timeout.cancel()
+                shot.fire { decide(err == nil ? .confirmed : .failed) }
+            }
+        }
     }
 
     // MARK: watcher loop (transitions only, mirrors the shell prototype)
 
     private func tick() {
-        // Refresh registration state and fanInfo (live RPM) every poll — before
-        // the boost-enabled guard so they stay fresh with boosting toggled off.
+        // Refresh registration state first, then let reconciliation progress
+        // (requiresApproval resolves here) before anything may talk fan
+        // state to a possibly-old helper. Once reconciled, refresh fanInfo
+        // (live RPM) every poll so it stays fresh with boosting toggled off.
         refreshHelperStatus()
+        guard reconciled else { reconcile(); return }
         refreshStatusFromHelper()
         guard enabled, helperStatus == .enabled else { return }
         switch probe.check() {
@@ -242,15 +399,15 @@ final class AppState: ObservableObject {
     }
 
     func quit() {
-        if phase == .boosting { stopBoost() }
-        // The helper's dead-man and connection-invalidation paths also cover
-        // an abrupt exit; this is just the polite path.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            NSApp.terminate(nil)
-        }
+        // The applicationShouldTerminate gate performs and confirms the
+        // restore (fail closed) before allowing termination.
+        NSApp.terminate(nil)
     }
 
     var statusLine: String {
+        // Until reconciliation confirms the current helper, never claim
+        // automatic — the last error (if any) is shown by the existing row.
+        if !reconciled { return "Verifying fan helper after update — fan state unconfirmed" }
         if helperStatus != .enabled { return "Helper not active" }
         switch phase {
         case .idle: return "Idle — fans automatic"
@@ -261,17 +418,50 @@ final class AppState: ObservableObject {
     }
 
     var iconName: String {
+        if !reconciled { return "exclamationmark.triangle" } // unconfirmed state
         switch phase {
         case .boosting: return "fan.fill"
-        case .probeUnavailable, .fanless: return "fan.badge.exclamationmark" // warning states
+        case .probeUnavailable, .fanless: return "exclamationmark.triangle" // warning states
         case .idle: return helperStatus == .enabled ? "fan" : "fan.slash"
         }
     }
 }
 
+/// Sole graceful-termination safety gate (spec §5.1): ordinary Quit and
+/// every Sparkle install mode all terminate through here.
+final class TerminationGate: NSObject, NSApplicationDelegate {
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        Task { @MainActor in
+            AppState.shared.confirmRestoreForTermination { ok in
+                sender.reply(toApplicationShouldTerminate: ok)
+            }
+        }
+        return .terminateLater
+    }
+}
+
+/// Sparkle's documented SwiftUI pattern for the menu item's enabled state.
+final class CheckForUpdatesViewModel: ObservableObject {
+    @Published var canCheckForUpdates = false
+    init(updater: SPUUpdater) {
+        updater.publisher(for: \.canCheckForUpdates).assign(to: &$canCheckForUpdates)
+    }
+}
+
 @main
 struct FanBoostApp: App {
-    @StateObject private var state = AppState()
+    @NSApplicationDelegateAdaptor(TerminationGate.self) private var gate
+    @StateObject private var state = AppState.shared
+    @StateObject private var checkVM: CheckForUpdatesViewModel
+    private let updaterController: SPUStandardUpdaterController
+
+    init() {
+        let controller = SPUStandardUpdaterController(startingUpdater: true,
+                                                      updaterDelegate: nil,
+                                                      userDriverDelegate: nil)
+        updaterController = controller
+        _checkVM = StateObject(wrappedValue: CheckForUpdatesViewModel(updater: controller.updater))
+    }
 
     var body: some Scene {
         MenuBarExtra {
@@ -301,6 +491,9 @@ struct FanBoostApp: App {
             Toggle("Launch at login", isOn: Binding(
                 get: { state.launchAtLogin },
                 set: { state.launchAtLogin = $0 }))
+
+            Button("Check for Updates…") { updaterController.updater.checkForUpdates() }
+                .disabled(!checkVM.canCheckForUpdates)
 
             if state.helperStatus == .enabled {
                 Button("Uninstall Fan Helper") { state.unregisterHelper() }

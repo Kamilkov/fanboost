@@ -13,11 +13,13 @@
 		16A1671B3209B1A75A86C62B /* LegacyCleanup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AA8EE94F4A8A36D36FE6FBD /* LegacyCleanup.swift */; };
 		175CD9C4CA14E10B397C701A /* HelperClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EDA3BA638F7D8F8DF2A1687 /* HelperClient.swift */; };
 		175E6F95853C38F6EF06FE49 /* smc_bridge.c in Sources */ = {isa = PBXBuildFile; fileRef = D32DF439FB4A5165BEC335B4 /* smc_bridge.c */; };
+		2962CEFB53BA51CC43F96104 /* UpdateLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FCD73924823E1319F6E1411 /* UpdateLogic.swift */; };
 		2E80969857F4447F8E324E37 /* FanMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0120326251EA955D954008DF /* FanMath.swift */; };
 		3727DF13FA0681463EFDB940 /* LegacyPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532D22D05212DB47E282423 /* LegacyPaths.swift */; };
 		3A86163F55849A5C4372022C /* FanController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D294B3CB01012D9DB61F9EA4 /* FanController.swift */; };
 		63562F46E44634618A1BBF8F /* SecureUnlink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E4F9E946616349EEC0A7490 /* SecureUnlink.swift */; };
 		7A98D48CE03707056320692F /* PeerRequirement.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F77636D1668F01A06878D4 /* PeerRequirement.swift */; };
+		7DAC673A7AA1768817FB905E /* UpdateLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FCD73924823E1319F6E1411 /* UpdateLogic.swift */; };
 		8B673D561FAC2EF31D36E9A6 /* CaptureProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC24DF2D32C35BF81A7B18EF /* CaptureProbe.swift */; };
 		90B4FF0468466F556B3A4FBD /* FanBoostXPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BB11452B9B37ECD13610E /* FanBoostXPC.swift */; };
 		9B98990C73624EB6657D7AD7 /* smc.c in Sources */ = {isa = PBXBuildFile; fileRef = A695A482CFA280C8653741A7 /* smc.c */; };
@@ -25,6 +27,7 @@
 		B12D736095F27DB08CD2253C /* FanBoostXPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BB11452B9B37ECD13610E /* FanBoostXPC.swift */; };
 		DC90B839FDBC3B072E9BF44F /* OwnerGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F542D04761E506304B4E8F /* OwnerGate.swift */; };
 		DDF92EF5051A69F6ABB3DF19 /* LegacyPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532D22D05212DB47E282423 /* LegacyPaths.swift */; };
+		E7F0AA9150DB525393986CA9 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 2BE077269D1CE278FCC5DCA9 /* Sparkle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +53,7 @@
 		7AA8EE94F4A8A36D36FE6FBD /* LegacyCleanup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyCleanup.swift; sourceTree = "<group>"; };
 		7E4F9E946616349EEC0A7490 /* SecureUnlink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureUnlink.swift; sourceTree = "<group>"; };
 		80B68F59C2F7F4E69F7216BF /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		8FCD73924823E1319F6E1411 /* UpdateLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateLogic.swift; sourceTree = "<group>"; };
 		914DD63D77EF33D5480DCADF /* FanBoostHelper-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FanBoostHelper-Bridging-Header.h"; sourceTree = "<group>"; };
 		A695A482CFA280C8653741A7 /* smc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = smc.c; sourceTree = "<group>"; };
 		AA1BB11452B9B37ECD13610E /* FanBoostXPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanBoostXPC.swift; sourceTree = "<group>"; };
@@ -60,6 +64,17 @@
 		FC24DF2D32C35BF81A7B18EF /* CaptureProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureProbe.swift; sourceTree = "<group>"; };
 		FD69DFAF7CB0CE9E3BA3FD1F /* FanBoostHelper */ = {isa = PBXFileReference; includeInIndex = 0; path = FanBoostHelper; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		457FAD1B120DF64224C3AF9E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E7F0AA9150DB525393986CA9 /* Sparkle in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		0D21625A0141B3B7EED1796C /* SMC */ = {
@@ -125,6 +140,7 @@
 				0120326251EA955D954008DF /* FanMath.swift */,
 				0532D22D05212DB47E282423 /* LegacyPaths.swift */,
 				B9F77636D1668F01A06878D4 /* PeerRequirement.swift */,
+				8FCD73924823E1319F6E1411 /* UpdateLogic.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -154,7 +170,9 @@
 			buildConfigurationList = CF7FE001ADBA69024F31B928 /* Build configuration list for PBXNativeTarget "FanBoost" */;
 			buildPhases = (
 				38D11B1CEA3B6DFD685D9E72 /* Sources */,
+				457FAD1B120DF64224C3AF9E /* Frameworks */,
 				7B0C687B3A013F00E5E31CD4 /* Embed FanBoostHelper */,
+				31E213D2D1E87691D651103E /* Re-sign Sparkle nested code (Release) */,
 			);
 			buildRules = (
 			);
@@ -163,6 +181,7 @@
 			);
 			name = FanBoost;
 			packageProductDependencies = (
+				2BE077269D1CE278FCC5DCA9 /* Sparkle */,
 			);
 			productName = FanBoost;
 			productReference = 0876C3C05D55EC4023C5C3E8 /* FanBoost.app */;
@@ -194,6 +213,9 @@
 			);
 			mainGroup = 4157FB7CC748A51B880D8A52;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				0F2B1B60226E8B3AB8F7CE5D /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B71C9B7584AE137EF42F5CA0 /* Products */;
 			projectDirPath = "";
@@ -206,6 +228,24 @@
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		31E213D2D1E87691D651103E /* Re-sign Sparkle nested code (Release) */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Re-sign Sparkle nested code (Release)";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"$CONFIGURATION\" = \"Release\" ]; then\n  FW=\"$BUILT_PRODUCTS_DIR/$WRAPPER_NAME/Contents/Frameworks/Sparkle.framework\"\n  codesign -f -o runtime --timestamp -s \"$EXPANDED_CODE_SIGN_IDENTITY\" --preserve-metadata=entitlements \"$FW/Versions/B/XPCServices/Downloader.xpc\"\n  codesign -f -o runtime --timestamp -s \"$EXPANDED_CODE_SIGN_IDENTITY\" \"$FW/Versions/B/XPCServices/Installer.xpc\"\n  codesign -f -o runtime --timestamp -s \"$EXPANDED_CODE_SIGN_IDENTITY\" \"$FW/Versions/B/Autoupdate\"\n  codesign -f -o runtime --timestamp -s \"$EXPANDED_CODE_SIGN_IDENTITY\" \"$FW/Versions/B/Updater.app\"\n  codesign -f -o runtime --timestamp -s \"$EXPANDED_CODE_SIGN_IDENTITY\" \"$FW\"\nfi\n";
+		};
 		7B0C687B3A013F00E5E31CD4 /* Embed FanBoostHelper */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -242,6 +282,7 @@
 				175CD9C4CA14E10B397C701A /* HelperClient.swift in Sources */,
 				DDF92EF5051A69F6ABB3DF19 /* LegacyPaths.swift in Sources */,
 				7A98D48CE03707056320692F /* PeerRequirement.swift in Sources */,
+				2962CEFB53BA51CC43F96104 /* UpdateLogic.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -257,6 +298,7 @@
 				DC90B839FDBC3B072E9BF44F /* OwnerGate.swift in Sources */,
 				16A002574BBBEF4EEE205180 /* PeerRequirement.swift in Sources */,
 				63562F46E44634618A1BBF8F /* SecureUnlink.swift in Sources */,
+				7DAC673A7AA1768817FB905E /* UpdateLogic.swift in Sources */,
 				132F4F08E3B938D4E3EA102C /* main.swift in Sources */,
 				9B98990C73624EB6657D7AD7 /* smc.c in Sources */,
 				175E6F95853C38F6EF06FE49 /* smc_bridge.c in Sources */,
@@ -330,6 +372,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = JXGJ4K9KR9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -345,6 +388,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
@@ -423,6 +467,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = JXGJ4K9KR9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -444,6 +489,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -504,6 +550,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		0F2B1B60226E8B3AB8F7CE5D /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.6;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2BE077269D1CE278FCC5DCA9 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0F2B1B60226E8B3AB8F7CE5D /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8B9DA31B712CABBE27A92718 /* Project object */;
 }

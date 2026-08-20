@@ -1,5 +1,5 @@
-// FanBoost self-check: pure fan math. GPL-2.0.
-// Run: swiftc Shared/FanMath.swift checks/main.swift -o build/selfcheck && ./build/selfcheck
+// FanBoost self-check: pure fan math + update logic. GPL-2.0.
+// Run: swiftc Shared/FanMath.swift Shared/UpdateLogic.swift checks/main.swift -o build/selfcheck && ./build/selfcheck
 
 // Clamping onto a single fan's range (the prototype Mac mini's real range).
 assert(targetRPM(percent: 0, min: 1700, max: 5000) == 1700)
@@ -31,4 +31,37 @@ assert(compactRPM(fromStatus: "fan 0: 1701 RPM (1700–5000), fan 1: 3000 RPM (2
 assert(compactRPM(fromStatus: "fan 0: 1700–5000 RPM, fan 1: 2160–6800 RPM") == nil)
 assert(compactRPM(fromStatus: "fan state unknown") == nil)
 
-print("selfcheck OK (13 assertions)")
+// Startup reconciliation trigger: absent or mismatched marker → reconcile.
+assert(reconcileNeeded(lastRun: nil, current: "2"))
+assert(reconcileNeeded(lastRun: "1", current: "2"))
+assert(!reconcileNeeded(lastRun: "2", current: "2"))
+
+// Termination gate decision (spec §5.1 fail-closed branching): terminate
+// only when this app owns no manual state, or restore is CONFIRMED.
+assert(mayTerminate(helperEnabled: false, boosting: false, restore: .notAttempted))
+assert(mayTerminate(helperEnabled: true, boosting: false, restore: .confirmed))
+assert(mayTerminate(helperEnabled: true, boosting: true, restore: .confirmed))
+assert(!mayTerminate(helperEnabled: false, boosting: true, restore: .notAttempted), "boosting w/o helper must fail closed")
+assert(!mayTerminate(helperEnabled: true, boosting: true, restore: .timedOut))
+assert(!mayTerminate(helperEnabled: true, boosting: true, restore: .failed))
+assert(!mayTerminate(helperEnabled: true, boosting: false, restore: .timedOut), "expected-enabled helper unconfirmed must fail closed")
+assert(!mayTerminate(helperEnabled: true, boosting: false, restore: .failed))
+
+// Reconciliation decision (B3): a pending replacement must never let a
+// transient unregistered state write the marker via the first-run branch.
+assert(reconcileAction(pendingReplacement: false, helper: .unregistered) == .finish)
+assert(reconcileAction(pendingReplacement: false, helper: .enabled) == .beginReplacement)
+assert(reconcileAction(pendingReplacement: true, helper: .enabled) == .confirmOnly)
+assert(reconcileAction(pendingReplacement: true, helper: .unregistered) == .wait, "mid-replacement unregistered must NOT finish")
+assert(reconcileAction(pendingReplacement: false, helper: .requiresApproval) == .wait)
+assert(reconcileAction(pendingReplacement: true, helper: .requiresApproval) == .wait)
+
+// OneShot: both AppKit-reply paths (XPC reply, timeout) funnel through one
+// of these; the second fire must be ignored.
+var fired = 0
+let shot = OneShot()
+shot.fire { fired += 1 }
+shot.fire { fired += 1 }
+assert(fired == 1, "OneShot must run exactly once, ran \(fired)")
+
+print("selfcheck OK (31 assertions)")

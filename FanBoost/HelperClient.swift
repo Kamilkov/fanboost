@@ -16,8 +16,13 @@ final class HelperClient {
         let c = NSXPCConnection(machServiceName: kHelperMachService, options: .privileged)
         c.remoteObjectInterface = NSXPCInterface(with: FanBoostXPC.self)
         c.setCodeSigningRequirement(req)
-        c.invalidationHandler = { [weak self] in
-            DispatchQueue.main.async { self?.connection = nil }
+        // Clear the cache only if it still holds THIS connection: a stale
+        // handler arriving after reconcile has already cached a fresh
+        // connection to the new helper must not clear that fresh one.
+        c.invalidationHandler = { [weak self, weak c] in
+            DispatchQueue.main.async {
+                if let self, let c, self.connection === c { self.connection = nil }
+            }
         }
         c.resume()
         connection = c
@@ -28,5 +33,14 @@ final class HelperClient {
     /// or nil if the peer requirement can't be built (fail closed).
     func proxy(onError: @escaping (Error) -> Void) -> FanBoostXPC? {
         currentConnection()?.remoteObjectProxyWithErrorHandler(onError) as? FanBoostXPC
+    }
+
+    /// Drop the cached connection NOW. Reconciliation calls this between the
+    /// old helper's confirmed restore and unregister/register, so the next
+    /// proxy() connects fresh — to the new helper, never a stale peer. The
+    /// invalidationHandler still runs and keeps its normal safety semantics.
+    func invalidate() {
+        connection?.invalidate()
+        connection = nil
     }
 }

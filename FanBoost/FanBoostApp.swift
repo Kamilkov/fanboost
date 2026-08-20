@@ -274,9 +274,11 @@ struct FanBoostApp: App {
     @StateObject private var state = AppState()
 
     var body: some Scene {
-        MenuBarExtra("FanBoost", systemImage: state.iconName) {
+        MenuBarExtra {
             Text(state.statusLine)
-            Text(state.fanInfo)
+            // A Button (not Text) so the row renders in primary color instead
+            // of the dimmed disabled style; clicking refreshes immediately.
+            Button(state.fanInfo) { state.refreshStatusFromHelper() }
 
             Divider()
 
@@ -314,6 +316,14 @@ struct FanBoostApp: App {
 
             Divider()
             Button("Quit FanBoost") { state.quit() }
+        } label: {
+            // Persistent menu-bar label: fan icon plus compact live RPM,
+            // updated by the 5 s status refresh; icon-only when no live reading.
+            if let rpm = compactRPM(fromStatus: state.fanInfo) {
+                Text("\(Image(systemName: state.iconName)) \(rpm) RPM")
+            } else {
+                Image(systemName: state.iconName)
+            }
         }
     }
 }

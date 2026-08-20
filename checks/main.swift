@@ -24,4 +24,11 @@ assert(plan[1] == 2160 + 0.8 * 4640)
 // Fanless: empty plan, nothing to write.
 assert(boostPlan(percent: 80, ranges: []).isEmpty)
 
-print("selfcheck OK (9 assertions)")
+// Menu-bar compact RPM parsing: highest live reading wins; range-only
+// fallback, unknown, and querying strings yield nil (icon-only label).
+assert(compactRPM(fromStatus: "fan 0: 1701 RPM (1700–5000)") == 1701)
+assert(compactRPM(fromStatus: "fan 0: 1701 RPM (1700–5000), fan 1: 3000 RPM (2160–6800)") == 3000)
+assert(compactRPM(fromStatus: "fan 0: 1700–5000 RPM, fan 1: 2160–6800 RPM") == nil)
+assert(compactRPM(fromStatus: "fan state unknown") == nil)
+
+print("selfcheck OK (13 assertions)")

@@ -13,6 +13,16 @@ public func boostPlan(percent: Double, ranges: [(min: Double, max: Double)]) -> 
     ranges.map { targetRPM(percent: percent, min: $0.min, max: $0.max) }
 }
 
+/// Compact live RPM for the menu-bar label: the highest current reading
+/// ("N RPM (") in a helper status string, nil when it carries none
+/// (querying/unknown/fanless, or range-only fallback text like "1700–5000 RPM").
+public func compactRPM(fromStatus status: String) -> Int? {
+    status.components(separatedBy: " RPM (")
+        .dropLast()
+        .compactMap { Int($0.split(separator: " ").last ?? "") }
+        .max()
+}
+
 /// Encode an RPM as the SMC `flt` wire format: IEEE-754 single precision,
 /// little-endian, as a hex string (what SMCWriteSimple expects).
 public func fltHex(_ rpm: Double) -> String {

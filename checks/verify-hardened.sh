@@ -26,6 +26,21 @@ for bin in "$APP" "$HELPER"; do
             echo "FAIL: $bin carries exception entitlement $bad"; fail=1
         fi
     done
+    # Notarization prerequisites, enforced only on the Developer ID
+    # (distribution/Release) signature — Apple Development (Debug) legitimately
+    # has neither a secure timestamp nor a get-task-allow prohibition.
+    if codesign -dvvv "$bin" 2>&1 | grep -q "Authority=Developer ID Application"; then
+        if codesign -dvvv "$bin" 2>&1 | grep -q "^Timestamp="; then
+            echo "OK: secure timestamp on $bin"
+        else
+            echo "FAIL: Developer ID $bin has no secure timestamp (notarization blocker)"; fail=1
+        fi
+        if printf '%s' "$ents" | grep -q "com.apple.security.get-task-allow"; then
+            echo "FAIL: Developer ID $bin carries get-task-allow (notarization blocker)"; fail=1
+        else
+            echo "OK: no get-task-allow on $bin"
+        fi
+    fi
 done
 
 # Bundle must still be sealed. Capture stderr in a variable — no temp file.

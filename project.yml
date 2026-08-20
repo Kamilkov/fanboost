@@ -29,6 +29,11 @@ settings:
       CODE_SIGN_IDENTITY: Developer ID Application
       DEVELOPMENT_TEAM: JXGJ4K9KR9
       FB_IDENTITY_CLASS: developer-id
+      # Notarization requires a secure timestamp and forbids the debug
+      # get-task-allow entitlement — enable the timestamp and stop injecting
+      # base debug entitlements for the distribution build.
+      OTHER_CODE_SIGN_FLAGS: "--timestamp"
+      CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO
 targets:
   FanBoostHelper:
     type: tool

@@ -36,11 +36,10 @@ final class AppState: ObservableObject {
     // MARK: watcher loop (transitions only, mirrors the shell prototype)
 
     private func tick() {
-        // Refresh registration state every poll so approving the helper in
-        // System Settings takes effect without relaunching the app.
-        let previous = helperStatus
+        // Refresh registration state and fanInfo (live RPM) every poll — before
+        // the boost-enabled guard so they stay fresh with boosting toggled off.
         refreshHelperStatus()
-        if previous != .enabled, helperStatus == .enabled { refreshStatusFromHelper() }
+        refreshStatusFromHelper()
         guard enabled, helperStatus == .enabled else { return }
         switch probe.check() {
         case .capturing:

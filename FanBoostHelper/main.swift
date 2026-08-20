@@ -41,6 +41,12 @@ if dryRunCheck {
 
     // Discovery: default two fans, boost/restore, Ftst 0x82, non-0x82.
     precondition(controller.fans.count == 2, "dry-run should simulate 2 fans")
+    // Live-RPM formatting: fan 0 renders simulated Ac (=min), fan 1's failed
+    // Ac read falls back to its range-only text.
+    controller.simulatedAcFailIndex = 1
+    precondition(controller.currentDescription
+        == "fan 0: 1700 RPM (1700–5000), fan 1: 2160–6800 RPM", "currentDescription format/fallback")
+    controller.simulatedAcFailIndex = nil
     precondition(controller.boost(percent: 75) == nil, "dry-run boost failed")
     precondition(controller.boosting, "not boosting after boost")
     controller.restoreAuto()
@@ -194,7 +200,7 @@ final class HelperService: NSObject, FanBoostXPC {
 
     func status(reply: @escaping (Int32, String, Bool) -> Void) {
         controllerQueue.async {
-            reply(Int32(controller.fanCount), controller.rangesDescription, controller.boosting)
+            reply(Int32(controller.fanCount), controller.currentDescription, controller.boosting)
         }
     }
 

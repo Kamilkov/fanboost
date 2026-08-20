@@ -118,6 +118,30 @@ final class FanController {
         }
     }
 
+    /// Dry-run injection: one fan index whose F{i}Ac read is forced to fail
+    /// so the per-fan range fallback is testable without hardware.
+    var simulatedAcFailIndex: Int?
+
+    /// rangesDescription plus each fan's live F{i}Ac where readable; a fan
+    /// whose current-speed read fails falls back to its range-only text.
+    /// Read-only — never writes the SMC.
+    var currentDescription: String {
+        guard discovery == .available else { return rangesDescription }
+        return fans.map { fan in
+            var ac: Float = 0
+            let ok: Bool
+            if dryRun {
+                ok = simulatedAcFailIndex != fan.index
+                ac = Float(fan.minRPM)
+            } else {
+                ok = fb_read_flt("F\(fan.index)Ac", &ac) == 0
+            }
+            return ok
+                ? "fan \(fan.index): \(Int(ac)) RPM (\(Int(fan.minRPM))–\(Int(fan.maxRPM)))"
+                : "fan \(fan.index): \(Int(fan.minRPM))–\(Int(fan.maxRPM)) RPM"
+        }.joined(separator: ", ")
+    }
+
     /// Returns nil on success, else an error description. Refuses unavailable,
     /// fanless, AND incomplete discovery — boosting a fan whose range we could
     /// not read would mean guessing at safe RPM bounds.

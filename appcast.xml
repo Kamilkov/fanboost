@@ -7,5 +7,17 @@
     <link>https://github.com/Kamilkov/fanboost</link>
     <description>FanBoost release updates</description>
     <language>en</language>
+    <item>
+      <title>FanBoost 1.1.0</title>
+      <pubDate>Thu, 20 Aug 2026 11:51:29 +0000</pubDate>
+      <sparkle:version>2</sparkle:version>
+      <sparkle:shortVersionString>1.1.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+      <enclosure
+        url="https://github.com/Kamilkov/fanboost/releases/download/v1.1.0/FanBoost-1.1.0.dmg"
+        length="1215494"
+        type="application/x-apple-diskimage"
+        sparkle:edSignature="DYaAwpXCiTBFGBhRdsPNG0fx3ugYkpmKdETM58WGUxM07hHCfrfD1kHrr+Iri/2KS43jRLYf9xxcNVx/ktoiBQ==" />
+    </item>
   </channel>
 </rss>
